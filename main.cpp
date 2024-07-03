@@ -58,14 +58,25 @@ int main(int argc, char* argv[]) {
     int status;
     if (deviceName.compare("archon") == 0) {
 
-        for (int i=0; i < 1000; i++) {
-            string command("publish");
-            command.append(" ");
-            command.append("hsrtcsim");
-            command.append(" ");
-            
-            string frame = "frame:" + to_string(i);
-            command.append(frame);
+        for (int i=0; i < 100; i++) {
+            string operation("publish");
+            string channel("hsrtcsim");
+            // string data("archon_test");
+
+            vector<uint32_t> v(10, 0);
+            std::mt19937 mt{std::random_device{}()};
+            std::uniform_int_distribution<uint32_t> dist(0, numeric_limits<uint32_t>::max());
+            for (int i=0; i < v.size(); i++) {
+                v[i] = dist(mt);
+            }
+            string data(v.begin(), v.end());
+
+            // string data = to_string(dist(mt));
+            ostringstream msg;
+            msg << operation << " " << channel << " " << data;
+
+            string command = msg.str();
+            cout << command << endl;
 
             status = redisAsyncCommand(rc, archonSimulator, (char*)"pub", command.c_str());
         }
@@ -92,6 +103,7 @@ void archonSimulator(redisAsyncContext *c, void *r, void *privdata) {
     }
     cout << "Message published" << endl;
     redisAsyncDisconnect(c);
+    usleep(1000);
 }
 
 void ttmSimulator(redisAsyncContext *c, void *r, void *privdata) {
