@@ -1,3 +1,7 @@
+# Project specific files
+hsrtcsim
+.vscode
+
 # Prerequisites
 *.d
 
